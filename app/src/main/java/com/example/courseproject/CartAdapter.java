@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -12,32 +11,31 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.nio.BufferUnderflowException;
 import java.util.List;
 
-public class DishAdapter extends RecyclerView.Adapter<DishAdapter.ViewHolder> {
+public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
     List<Dish> dishes;
     Context context;
 
-    public DishAdapter(Context context, List<Dish> dishList) {
+    public CartAdapter(Context context, List<Dish> dishList) {
         this.context=context;
         dishes = dishList;
     }
 
     @NonNull
     @Override
-    public DishAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CartAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
 
         // Inflate the custom layout
-        View contactView = inflater.inflate(R.layout.dish_recyclerview, parent, false);
+        View contactView = inflater.inflate(R.layout.cart_recyclerview, parent, false);
 
-        return new ViewHolder(contactView);
+        return new CartAdapter.ViewHolder(contactView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull DishAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull CartAdapter.ViewHolder holder, int position) {
 
         Dish dish = dishes.get(position);
 
@@ -91,12 +89,13 @@ public class DishAdapter extends RecyclerView.Adapter<DishAdapter.ViewHolder> {
         public ViewHolder(View itemView) {
             super(itemView);
 
-            priceDishTextView = (TextView) itemView.findViewById(R.id.textView_price);
-            nameDishTextView = (TextView) itemView.findViewById(R.id.textView_dishName);
-            dishPhotoImageView=(ImageView) itemView.findViewById(R.id.imageView_dishPhoto);
-            countDishTextView=(TextView) itemView.findViewById(R.id.count_TextView);
-            removeButton=(ImageButton) itemView.findViewById(R.id.remove_Button);
-            addButton=(ImageButton) itemView.findViewById(R.id.add_Button);
+            priceDishTextView = (TextView) itemView.findViewById(R.id.textView_priceCart);
+            nameDishTextView = (TextView) itemView.findViewById(R.id.textView_dishNameCart);
+            dishPhotoImageView=(ImageView) itemView.findViewById(R.id.imageView_dishPhotoCart);
+            countDishTextView=(TextView) itemView.findViewById(R.id.count_TextViewCart);
+            removeButton=(ImageButton) itemView.findViewById(R.id.remove_ButtonCart);
+            addButton=(ImageButton) itemView.findViewById(R.id.add_ButtonCart);
         }
     }
+
 }

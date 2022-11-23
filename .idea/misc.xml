@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/androidLR7/courseProject/app/src/main/res/layout/activity_main.xml" value="0.21446078431372548" />
+        <entry key="..\:/androidLR7/courseProject/app/src/main/res/layout/cart_bottom_sheets.xml" value="0.21446078431372548" />
+        <entry key="..\:/androidLR7/courseProject/app/src/main/res/layout/cart_recyclerview.xml" value="0.2" />
         <entry key="..\:/androidLR7/courseProject/app/src/main/res/layout/category_food_recyclerview.xml" value="0.21446078431372548" />
         <entry key="..\:/androidLR7/courseProject/app/src/main/res/layout/dish_recyclerview.xml" value="0.72" />
         <entry key="..\:/androidLR7/courseProject/app/src/main/res/layout/order_fragment.xml" value="0.178125" />

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -14,6 +15,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,6 +35,9 @@ public class OrderFragment extends Fragment {
     FoodCategoryAdapter adapter;
     SearchView searchView;
 
+    Button toCartButton;
+
+    List<Dish> cartList;
 
     public OrderFragment(){
 
@@ -48,6 +54,7 @@ public class OrderFragment extends Fragment {
         View view=inflater.inflate(R.layout.order_fragment,container,false);
 
 
+        toCartButton=view.findViewById(R.id.toCart_Button);
         searchView=view.findViewById(R.id.searchView);
 
         // получаем идентификатор по имени файла
@@ -64,8 +71,25 @@ public class OrderFragment extends Fragment {
         dessertList=new ArrayList<>();
         drinkList=new ArrayList<>();
         wordGameList=new ArrayList<>();
+        cartList=new ArrayList<>();
 
         setInitialData();
+
+
+        toCartButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                CartAdapter cartAdapter = new CartAdapter(getContext(), cartList);
+                // размещение элементов
+                cartRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                // Прикрепрепляем адаптер к recyclerView
+                cartRecyclerView.setAdapter(cartAdapter);
+                cartAdapter.notifyDataSetChanged();
+                cartBottomSheetDialog.show();
+
+            }
+        });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
@@ -183,5 +207,20 @@ public class OrderFragment extends Fragment {
         parentModelClassList.add(new FoodCategory("Напитики", drinkList));
         
     }
+
+
+
+
+    RecyclerView cartRecyclerView;
+    BottomSheetDialog cartBottomSheetDialog;
+    // создание Bottom Sheets
+    private void createDialog(){
+        View view =getLayoutInflater().inflate(R.layout.cart_bottom_sheets,null,false);
+
+        cartRecyclerView=view.findViewById(R.id.rv_cart);
+
+        cartBottomSheetDialog.setContentView(view);
+    }
+
 
 }

@@ -18,10 +18,28 @@
         android:layout_height="1dp"
         android:background="@android:color/black"/>
 
-    <androidx.recyclerview.widget.RecyclerView
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/rv_parent"
-        />
+        android:layout_height="wrap_content">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rv_parent"
+            />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/toCart_Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/orange"
+            android:layout_gravity="bottom|right"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"/>
+
+    </FrameLayout>
 
 </LinearLayout>
