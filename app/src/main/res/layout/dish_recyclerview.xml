@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="307dp"
+    android:orientation="vertical">
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5sp"
+        android:layout_marginTop="5sp"
+        android:layout_marginRight="5sp"
+        android:layout_marginBottom="5sp"
+        app:cardCornerRadius="20dp">
+
+        <ImageView
+            android:id="@+id/imageView_dishPhoto"
+            android:layout_width="140dp"
+            android:layout_height="137dp"
+            app:srcCompat="@drawable/ic_launcher_foreground" />
+
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/textView_dishName"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:text="AppName"
+        android:layout_marginLeft="10dp"
+        android:textSize="16dp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:id="@+id/textView_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Price"
+            android:layout_marginLeft="10dp"
+            android:textSize="14dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="₽"
+            android:layout_marginLeft="3dp"/>
+
+    </LinearLayout>
+
+
+    <FrameLayout
+        android:id="@+id/fl_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/minus"
+            android:layout_gravity="center"
+            android:id="@+id/remove_Button"/>
+
+        <TextView
+            android:id="@+id/count_TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:layout_gravity="center"
+            android:textSize="14dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/free1"
+            android:layout_gravity="center"
+            android:id="@+id/add_Button"/>
+
+    </LinearLayout>
+
+
+
+
+
+</LinearLayout>

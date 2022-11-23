@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/purple_200">
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.courseProject.CardView.Authorization">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:text="Sign Up"
+                style="@style/Widget.courseProject.TextView.Header1" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/TextInputLayout.FilledBox"
+                    android:layout_weight="1"
+                    android:hint="Type your username"
+                    android:layout_marginTop="20dp"
+                    app:startIconDrawable="@drawable/user"
+                    >
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/white"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/TextInputLayout.FilledBox"
+                    android:hint="Type your username"
+                    android:layout_weight="1"
+                    android:layout_marginTop="20dp"
+
+                    app:startIconDrawable="@drawable/user"
+                    >
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:backgroundTint="@color/white"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+            </LinearLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/TextInputLayout.FilledBox"
+                android:hint="Type your username"
+                android:layout_marginTop="5dp"
+                app:startIconDrawable="@drawable/user"
+                >
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:backgroundTint="@color/white"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/TextInputLayout.FilledBox"
+                android:hint="Type your password"
+                android:layout_marginTop="5dp"
+                app:startIconDrawable="@drawable/lock"
+                >
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:backgroundTint="@color/white"
+
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/singUpButton"
+                android:text="Sign Up"
+                style="@style/Button"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/black"
+                android:layout_marginTop="20dp"
+                />
+
+
+            <Button
+                style="@style/Widget.courseProject.TextButton.Authorization"
+                android:id="@+id/singInButton"
+                android:text="Back"
+                android:onClick="SignInButton"
+                />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>
