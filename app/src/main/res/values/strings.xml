@@ -1,3 +1,31 @@
 <resources>
-    <string name="app_name">courseProject</string>
+    <string name="app_name">Garson</string>
+    <string name="profileTitle">Профиль</string>
+    <string name="personalInformation">Персональные данные</string>
+    <string name="personalInformationName">Имя</string>
+    <string name="personalInformationSurname">Фамилия</string>
+    <string name="personalInformationLogin">Логин</string>
+    <string name="personalInformationPassword">Пароль</string>
+    <string name="Settings">Настройки</string>
+    <string name="Language">Язык</string>
+    <string name="russianLanguage">Русский</string>
+    <string name="englishLanguage">English</string>
+    <string name="exit">Выход</string>
+    <string name="logout">Выход из аккаунта</string>
+    <string name="login">Вход</string>
+    <string name="signup">Зарегистрироваться</string>
+    <string name="haveAccount">У вас нет аккаунта?</string>
+    <string name="back">Назад</string>
+    <string name="cart">Чек</string>
+    <string name="price">Общая стоимость: </string>
+    <string name="createOrder">Создать заказ</string>
+    <string name="pay">Оплатить</string>
+    <string name="guestCount">Количество гостей</string>
+    <string name="add">Добавить</string>
+    <string name="emptyInformation">Информация о заказах отсутствует.</string>
+    <string name="createNewOrder">Создайте новый заказ</string>
+    <string name="schemeHall">Схема зала</string>
+    <string name="menu">Меню</string>
+    <string name="account">Аккаунт</string>
+    <string name="orders">Заказы</string>
 </resources>

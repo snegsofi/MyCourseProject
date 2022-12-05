@@ -19,11 +19,13 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()){
                 case R.id.navigation_home:
+                    loadFragment(HomeFragment.newInstance());
                     return true;
                 case R.id.navigation_order:
                     loadFragment(OrderFragment.newInstance());
                     return true;
                 case R.id.navigation_notifications:
+                    loadFragment(HallFragment.newInstance());
                     return true;
             }
             return false;
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private void loadFragment(Fragment fragment){
         FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fl_content,fragment);
+        ft.addToBackStack(null);
         ft.commit();
     }
 
@@ -43,5 +46,6 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView navigation=(BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.setSelectedItemId(R.id.navigation_order);
     }
 }

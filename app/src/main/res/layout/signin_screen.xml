@@ -1,79 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:background="@color/orange">
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   xmlns:app="http://schemas.android.com/apk/res-auto"/>
+
+    <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    android:orientation="vertical"-->
+<!--    android:background="@color/orange">-->
 
 
-    <com.google.android.material.card.MaterialCardView
-        style="@style/Widget.courseProject.CardView.Authorization"
-        android:layout_marginTop="200dp">
+<!--    <com.google.android.material.card.MaterialCardView-->
+<!--        style="@style/Widget.courseProject.CardView.Authorization"-->
+<!--        android:layout_marginTop="200dp">-->
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical">-->
 
-            <TextView
-                android:text="Login"
-                style="@style/Widget.courseProject.TextView.Header1" />
+<!--            <TextView-->
+<!--                android:text="Login"-->
+<!--                style="@style/Widget.courseProject.TextView.Header1" />-->
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/TextInputLayout.FilledBox"
-                android:hint="Введите логин"
-                android:layout_marginTop="50dp"
-                app:startIconDrawable="@drawable/user">
+<!--            <com.google.android.material.textfield.TextInputLayout-->
+<!--                style="@style/TextInputLayout.FilledBox"-->
+<!--                android:hint="Введите логин"-->
+<!--                android:layout_marginTop="50dp"-->
+<!--                app:startIconDrawable="@drawable/user">-->
 
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:backgroundTint="@color/white" />
+<!--                <com.google.android.material.textfield.TextInputEditText-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:singleLine="true"-->
+<!--                    android:backgroundTint="@color/white" />-->
 
-            </com.google.android.material.textfield.TextInputLayout>
+<!--            </com.google.android.material.textfield.TextInputLayout>-->
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/TextInputLayout.FilledBox"
-                android:hint="Введите пароль"
-                android:layout_marginTop="10dp"
-                app:startIconDrawable="@drawable/lock"
-                >
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:backgroundTint="@color/white"
+<!--            <com.google.android.material.textfield.TextInputLayout-->
+<!--                style="@style/TextInputLayout.FilledBox"-->
+<!--                android:hint="Введите пароль"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                app:startIconDrawable="@drawable/lock"-->
+<!--                >-->
+<!--                <com.google.android.material.textfield.TextInputEditText-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:singleLine="true"-->
+<!--                    android:backgroundTint="@color/white"-->
 
-                    />
-            </com.google.android.material.textfield.TextInputLayout>
+<!--                    />-->
+<!--            </com.google.android.material.textfield.TextInputLayout>-->
 
-            <Button
-                android:id="@+id/loginButton"
-                android:text="Login"
-                style="@style/Button"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/orange"
-                android:layout_marginTop="30dp"
-                />
+<!--            <Button-->
+<!--                android:id="@+id/loginButton"-->
+<!--                android:text="Login"-->
+<!--                style="@style/Button"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:backgroundTint="@color/orange"-->
+<!--                android:layout_marginTop="30dp"-->
+<!--                />-->
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Have not account yet?"
-                android:gravity="center"
-                android:layout_marginTop="30dp"/>
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Have not account yet?"-->
+<!--                android:gravity="center"-->
+<!--                android:layout_marginTop="30dp"/>-->
 
-            <Button
-                style="@style/Widget.courseProject.TextButton.Authorization"
-                android:id="@+id/singUpButton"
-                android:text="Sign Up"
-                android:onClick="SignUpButton"
-                />
+<!--            <Button-->
+<!--                style="@style/Widget.courseProject.TextButton.Authorization"-->
+<!--                android:id="@+id/singUpButton"-->
+<!--                android:text="Sign Up"-->
+<!--                android:onClick="SignUpButton"-->
+<!--                />-->
 
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+<!--        </LinearLayout>-->
+<!--    </com.google.android.material.card.MaterialCardView>-->
 
-</LinearLayout>
+<!--</LinearLayout>-->

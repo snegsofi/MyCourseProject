@@ -1,6 +1,7 @@
 package com.example.courseproject;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +18,10 @@ public class FoodCategoryAdapter extends RecyclerView.Adapter<FoodCategoryAdapte
     List<FoodCategory> foodCategories;
     Context context;
 
-    public FoodCategoryAdapter(Context context, List<FoodCategory> foodCategoryList) {
+    public FoodCategoryAdapter(Context context, List<FoodCategory> foodCategoryList, ItemClickListener clickListener) {
         this.context=context;
         this.foodCategories = foodCategoryList;
+        this.clickListener=clickListener;
     }
 
     @NonNull
@@ -39,7 +41,14 @@ public class FoodCategoryAdapter extends RecyclerView.Adapter<FoodCategoryAdapte
 
         holder.foodCategoryTextView.setText(foodCategories.get(position).getCategoryName());
 
-        adapter=new DishAdapter(context, foodCategories.get(position).getDishList());
+        adapter=new DishAdapter(context, foodCategories.get(position).getDishList(), new DishAdapter.ItemClickListener() {
+            @Override
+            public void onItemClick(Dish dish, int position) {
+
+                Log.d("2",Integer.toString(dish.getDishCount()));
+                clickListener.onAddItemClick(dish, holder.getAdapterPosition(),position);
+            }
+        });
 
         // размещение элементов
         holder.foodRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL,false));
@@ -48,6 +57,8 @@ public class FoodCategoryAdapter extends RecyclerView.Adapter<FoodCategoryAdapte
         adapter.notifyDataSetChanged();
 
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -71,5 +82,12 @@ public class FoodCategoryAdapter extends RecyclerView.Adapter<FoodCategoryAdapte
     public void setFilterList(List<FoodCategory> filterList){
         this.foodCategories=filterList;
         notifyDataSetChanged();
+    }
+
+
+    private ItemClickListener clickListener;
+
+    public interface ItemClickListener{
+        void onAddItemClick(Dish dish, int categoryPosition, int dishPosition);
     }
 }

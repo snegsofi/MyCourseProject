@@ -38,7 +38,12 @@ public class GuestAdapter extends RecyclerView.Adapter<GuestAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull GuestAdapter.ViewHolder holder, int position) {
         holder.guestTextView.setText(guests.get(position).getGuestName());
 
-        dishAdapter=new DishAdapter(context, guests.get(position).getDishList());
+        dishAdapter=new DishAdapter(context, guests.get(position).getDishList(), new DishAdapter.ItemClickListener() {
+            @Override
+            public void onItemClick(Dish dish, int position) {
+
+            }
+        });
 
         // размещение элементов
         holder.dishRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL,false));

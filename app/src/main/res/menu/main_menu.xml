@@ -3,13 +3,16 @@
 
     <item
         android:id="@+id/navigation_home"
-        android:title="Home"/>
+        android:title="@string/account"
+        android:icon="@drawable/user"/>
 
     <item
         android:id="@+id/navigation_order"
-        android:title="Order"/>
+        android:title="@string/orders"
+        android:icon="@drawable/shopping_cart"/>
 
     <item
         android:id="@+id/navigation_notifications"
-        android:title="Notifications"/>
+        android:title="@string/schemeHall"
+        android:icon="@drawable/scheme"/>
 </menu>

@@ -1,6 +1,7 @@
 package com.example.courseproject;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +19,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     List<Dish> dishes;
     Context context;
 
-    public CartAdapter(Context context, List<Dish> dishList) {
+    public CartAdapter(Context context, List<Dish> dishList,ItemClickListener clickListener) {
         this.context=context;
         dishes = dishList;
+        this.clickListener=clickListener;
     }
 
     @NonNull
@@ -40,24 +42,34 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         Dish dish = dishes.get(position);
 
         // Установка значений элементам
-        TextView textView = holder.priceDishTextView;
-        textView.setText(Integer.toString(dish.getDishPrice()));
         TextView textView1 = holder.nameDishTextView;
         textView1.setText(dish.getDishName());
         ImageView imageView=holder.dishPhotoImageView;
         imageView.setImageResource(dish.getDishPhoto());
+        TextView count= holder.countDishTextView;
+        count.setText(Integer.toString(dish.getDishCount()));
+        TextView textView = holder.priceDishTextView;
+        textView.setText(Integer.toString(dish.getDishPrice()));
 
         ImageButton removeButton= holder.removeButton;
         ImageButton addButton= holder.addButton;
-        TextView count= holder.countDishTextView;
+        ImageButton deleteButton=holder.deleteButton;
+
 
         removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(Integer.parseInt(count.getText().toString())>0){
+                if(Integer.parseInt(count.getText().toString())>1){
                     int countDish=Integer.parseInt(count.getText().toString());
                     countDish--;
                     count.setText(Integer.toString(countDish));
+
+                    int newPrice=dish.getDishPrice()-(dish.getDishPrice()/(countDish+1));
+                    dish.setDishPrice(newPrice);
+                    textView.setText(Integer.toString(dish.getDishPrice()));
+                }
+                else{
+                    clickListener.onItemClick(dish, holder.getAdapterPosition());
                 }
             }
         });
@@ -68,6 +80,20 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                 int countDish=Integer.parseInt(count.getText().toString());
                 countDish++;
                 count.setText(Integer.toString(countDish));
+                dish.setDishCount(countDish);
+
+                int newPrice=countDish*(dish.getDishPrice()/(countDish-1));
+                dish.setDishPrice(newPrice);
+                textView.setText(Integer.toString(dish.getDishPrice()));
+
+                clickListener.onNewItemCount(dish, holder.getAdapterPosition());
+            }
+        });
+
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clickListener.onItemClick(dish, holder.getAdapterPosition());
             }
         });
     }
@@ -85,6 +111,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         public TextView countDishTextView;
         public ImageButton removeButton;
         public ImageButton addButton;
+        public ImageButton deleteButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -95,7 +122,15 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
             countDishTextView=(TextView) itemView.findViewById(R.id.count_TextViewCart);
             removeButton=(ImageButton) itemView.findViewById(R.id.remove_ButtonCart);
             addButton=(ImageButton) itemView.findViewById(R.id.add_ButtonCart);
+            deleteButton=(ImageButton) itemView.findViewById(R.id.delete_ButtonCart);
         }
+    }
+
+    private ItemClickListener clickListener;
+
+    public interface ItemClickListener{
+        void onItemClick(Dish dish, int position);
+        void onNewItemCount(Dish dish,int position);
     }
 
 }

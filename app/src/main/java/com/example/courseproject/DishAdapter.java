@@ -1,6 +1,8 @@
 package com.example.courseproject;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,20 +12,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.nio.BufferUnderflowException;
 import java.util.List;
 
 public class DishAdapter extends RecyclerView.Adapter<DishAdapter.ViewHolder> {
-
-    List<Dish> dishes;
-    Context context;
-
-    public DishAdapter(Context context, List<Dish> dishList) {
-        this.context=context;
-        dishes = dishList;
-    }
 
     @NonNull
     @Override
@@ -53,6 +51,8 @@ public class DishAdapter extends RecyclerView.Adapter<DishAdapter.ViewHolder> {
         ImageButton addButton= holder.addButton;
         TextView count= holder.countDishTextView;
 
+
+
         removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,6 +60,8 @@ public class DishAdapter extends RecyclerView.Adapter<DishAdapter.ViewHolder> {
                     int countDish=Integer.parseInt(count.getText().toString());
                     countDish--;
                     count.setText(Integer.toString(countDish));
+                    dish.setDishCount(countDish);
+                    clickListener.onItemClick(dish, holder.getAdapterPosition());
                 }
             }
         });
@@ -70,6 +72,10 @@ public class DishAdapter extends RecyclerView.Adapter<DishAdapter.ViewHolder> {
                 int countDish=Integer.parseInt(count.getText().toString());
                 countDish++;
                 count.setText(Integer.toString(countDish));
+                dish.setDishCount(countDish);
+
+                Log.d("1",Integer.toString(dish.getDishCount()));
+                clickListener.onItemClick(dish, holder.getAdapterPosition());
             }
         });
     }
@@ -99,4 +105,25 @@ public class DishAdapter extends RecyclerView.Adapter<DishAdapter.ViewHolder> {
             addButton=(ImageButton) itemView.findViewById(R.id.add_Button);
         }
     }
+
+    List<Dish> dishes;
+    Context context;
+
+    CartViewModel cartViewModel;
+
+    public DishAdapter(Context context, List<Dish> dishList, ItemClickListener clickListener) {
+        this.context=context;
+        dishes = dishList;
+        this.clickListener=clickListener;
+
+    }
+
+    private ItemClickListener clickListener;
+
+    public interface ItemClickListener{
+        void onItemClick(Dish dish, int position);
+    }
+
+
+
 }

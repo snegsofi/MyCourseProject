@@ -37,8 +37,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:textSize">12dp</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:layout_marginLeft">200dp</item>
+        <item name="android:layout_gravity">center</item>
     </style>
 
     <style name="Widget.courseProject.ImageButton" parent="Widget.Material3.Button.ElevatedButton">
@@ -53,4 +52,14 @@
         <item name="cornerSize">4dp</item>
     </style>
 
+    <style name="chips" parent="Widget.MaterialComponents.Chip.Filter">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+        <item name="chipBackgroundColor">@color/chips_back</item>
+    </style>
+
+    <style name="Widget.CourseProject.Button.OutlinedButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/orange</item>
+
+    </style>
 </resources>

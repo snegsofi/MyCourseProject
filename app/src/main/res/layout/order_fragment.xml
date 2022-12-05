@@ -6,40 +6,30 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <SearchView
-        android:id="@+id/searchView"
+
+    <ViewStub
+        android:id="@+id/emptyStateLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:background="@color/orange"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/black"/>
-
+        android:layout_gravity="center"
+        android:layout="@layout/empty_order_state"
+        android:visibility="gone"/>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/rv_parent"
-            />
-
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/toCart_Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/orange"
-            android:layout_gravity="bottom|right"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="20dp"/>
-
-    </FrameLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/newOrder_Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/orange"
+        android:layout_gravity="bottom|right"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/plus" />
 
 </LinearLayout>

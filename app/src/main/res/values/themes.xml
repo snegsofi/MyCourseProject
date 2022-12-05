@@ -1,6 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.CourseProject" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.CourseProject" parent="Theme.MaterialComponents.DayNight">
+
+        <!--        parent="Theme.Material3.DayNight"-->
+
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/orange</item>
         <item name="colorPrimaryVariant">@color/orange</item>
@@ -12,8 +15,7 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
-
-        <item name="fontFamily">@font/librebaskerville_regular</item>
+        <item name="fontFamily">@font/source_serif_pro_regular</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

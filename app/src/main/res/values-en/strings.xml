@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Garson</string>
+    <string name="profileTitle">Profile</string>
+    <string name="personalInformation">Personal information</string>
+    <string name="personalInformationName">Name</string>
+    <string name="personalInformationSurname">Surname</string>
+    <string name="personalInformationLogin">Login</string>
+    <string name="personalInformationPassword">Password</string>
+    <string name="Settings">Settings</string>
+    <string name="Language">Language</string>
+    <string name="russianLanguage">Русский</string>
+    <string name="englishLanguage">English</string>
+    <string name="exit">Exit</string>
+    <string name="logout">Logout</string>
+    <string name="login">SignIn</string>
+    <string name="signup">SignUp</string>
+    <string name="haveAccount">Do you have account?</string>
+    <string name="back">back</string>
+    <string name="cart">Cart</string>
+    <string name="price">Total: </string>
+    <string name="createOrder">Create order</string>
+    <string name="pay">Pay</string>
+    <string name="guestCount">Guest count</string>
+    <string name="add">Add</string>
+    <string name="emptyInformation">No orders</string>
+    <string name="createNewOrder">Create new order</string>
+    <string name="schemeHall">Scheme</string>
+    <string name="menu">Menu</string>
+    <string name="account">Account</string>
+    <string name="orders">Orders</string>
+
+</resources>
