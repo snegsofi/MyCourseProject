@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -26,17 +27,25 @@ import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.nio.channels.SelectableChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
-public class MenuFragment extends Fragment implements CartAdapter.ItemClickListener,
+public class MenuFragment extends Fragment implements
         FoodCategoryAdapter.ItemClickListener, ChipAdapter.ItemClickListener,
         GuestCartAdapter.ItemClickListener {
     List<FoodCategory> parentModelClassList;
@@ -53,10 +62,13 @@ public class MenuFragment extends Fragment implements CartAdapter.ItemClickListe
 
     ImageButton backOrderButton;
     Button toCartButton;
+    Button createOrderButton;
+
     List<Dish> cartList;
     CartAdapter cartAdapter;
     GuestCartAdapter guestCartAdapter;
     ChipAdapter chipAdapter;
+    RecyclerView parent_rv;
 
     RecyclerView chipRecyclerView;
     ChipGroup chipGroup;
@@ -67,45 +79,42 @@ public class MenuFragment extends Fragment implements CartAdapter.ItemClickListe
 
     List<GuestCart> guestCarts;
 
+    FirebaseFirestore db;
+    RecyclerView cartRecyclerView;
+    BottomSheetDialog cartBottomSheetDialog;
+
+
+
     private static final String ARG_PARAM1="param1";
+    private static final String ARG_PARAM2="param2";
+    private static final String ARG_PARAM3="param3";
+    private static final String TAG = "orders";
+
 
     public MenuFragment(){
 
     }
 
-    public static MenuFragment newInstance(int guestCount)
+    public static MenuFragment newInstance(int guestCount, int tableNumber, String waiter)
     {
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1,guestCount);
+        args.putInt(ARG_PARAM2,tableNumber);
+        args.putString(ARG_PARAM3,waiter);
         MenuFragment fragment = new MenuFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.menu_fragment,container,false);
-
+    public void initialComponent(View view){
 
         backOrderButton=view.findViewById(R.id.backOrderButton);
         toCartButton=view.findViewById(R.id.toCart_Button);
         searchView=view.findViewById(R.id.searchView);
         chipGroup=view.findViewById(R.id.chipGroup);
         chipRecyclerView=view.findViewById(R.id.rv_chip);
-
         guestCarts=new ArrayList<>();
-
-        // получаем идентификатор по имени файла
-        int ids = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
-        TextView textView = (TextView) searchView.findViewById(ids);
-        textView.setTextColor(Color.BLACK);
-
-        searchView.clearFocus();
-
-        RecyclerView parent_rv=(RecyclerView) view.findViewById(R.id.rv_parent);
-
         dishesSelectedHashMap=new HashMap<>();
         guestList=new ArrayList<>();
         parentModelClassList=new ArrayList<>();
@@ -117,8 +126,32 @@ public class MenuFragment extends Fragment implements CartAdapter.ItemClickListe
         wordGameList=new ArrayList<>();
         cartList=new ArrayList<>();
         guestNumber=0;
+        db = FirebaseFirestore.getInstance();
+        selectedMenuItemGuest=new HashMap<>();
+        parent_rv=(RecyclerView) view.findViewById(R.id.rv_parent);
+        saveCartMap=new HashMap<>();
+    }
+
+    RecyclerView guestCart_rv;
+
+
+    Map<String,List<Dish>> saveCartMap;
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view=inflater.inflate(R.layout.menu_fragment,container,false);
+
+        initialComponent(view);
+
+        // получаем идентификатор по имени файла
+        int ids = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+        TextView textView = (TextView) searchView.findViewById(ids);
+        textView.setTextColor(Color.BLACK);
+
+        searchView.clearFocus();
 
         setInitialData();
+
 
 
         toCartButton.setOnClickListener(new View.OnClickListener() {
@@ -126,23 +159,43 @@ public class MenuFragment extends Fragment implements CartAdapter.ItemClickListe
             public void onClick(View v) {
 
                 createDialog();
-                //cartList.add(new Dish(349, "Английский завтрак",R.drawable.img));
 
-                Log.d("4",Integer.toString(cartList.get(0).getDishCount()));
-                //guestCartAdapter=new GuestCartAdapter(getContext(),guestCarts,MenuFragment.this);
-                //cartRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                //cartRecyclerView.setAdapter(cartAdapter);
-                //guestCartAdapter.notifyDataSetChanged();
-                //cartBottomSheetDialog.show();
+                guestCarts=new ArrayList<>();
 
-                cartAdapter = new CartAdapter(getContext(), cartList,MenuFragment.this);
+                Integer price=0;
+                for(int l=0;l<guestCount;l++){
+                    if(selectedMenuItemGuest.containsKey(l)) {
+
+                        List<DishesSelected> selectedDishes=selectedMenuItemGuest.get(l);
+                        List<Dish> dishesToCart=new ArrayList<>();
+
+                        for(int k=0;k<selectedDishes.size();k++){
+                            for (int i = 0; i < parentModelClassList.size(); i++) {
+                                for (int j = 0; j < parentModelClassList.get(i).getDishList().size(); j++) {
+                                    if(parentModelClassList.get(i).getDishList().get(j).getDishName().contains(selectedDishes.get(k).getDishName())){
+                                        dishesToCart.add(parentModelClassList.get(i).getDishList().get(j));
+                                        dishesToCart.get(k).setDishCount(selectedDishes.get(k).getDishCount());
+                                        price+=dishesToCart.get(k).getDishPrice();
+                                    }
+                                }
+                            }
+                        }
+
+                        guestCarts.add(new GuestCart(l,dishesToCart));
+
+                        saveCartMap.put(Integer.toString(l),dishesToCart);
+                    }
+                }
+
+
+                totalPriceTextView.setText(Integer.toString(price));
+                guestCartAdapter = new GuestCartAdapter(getContext(), guestCarts,MenuFragment.this);
                 // размещение элементов
-                cartRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                guestCart_rv.setLayoutManager(new LinearLayoutManager(getContext()));
                 // Прикрепрепляем адаптер к recyclerView
-                cartRecyclerView.setAdapter(cartAdapter);
-                cartAdapter.notifyDataSetChanged();
+                guestCart_rv.setAdapter(guestCartAdapter);
+                guestCartAdapter.notifyDataSetChanged();
                 cartBottomSheetDialog.show();
-
             }
         });
 
@@ -185,6 +238,7 @@ public class MenuFragment extends Fragment implements CartAdapter.ItemClickListe
                 guestList.add(new ChipModel("Гость "+Integer.toString(i+1),false));
             }
         }
+
         chipAdapter=new ChipAdapter(getContext(),guestList,MenuFragment.this);
         chipRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL,false));
         chipRecyclerView.setAdapter(chipAdapter);
@@ -200,6 +254,165 @@ public class MenuFragment extends Fragment implements CartAdapter.ItemClickListe
 
         return view;
     }
+
+
+    HashMap<Integer,List<DishesSelected>> selectedMenuItemGuest;
+
+    // FoodCategoryAdapter
+    @Override
+    public void onAddItemClick(Dish dish, int categoryPosition, int dishPosition) {
+
+        Log.d("SelectedItem", categoryPosition+" "+dishPosition);
+
+        List<DishesSelected> selectedDishes=new ArrayList<>();
+
+        if(selectedMenuItemGuest.containsKey(guestNumber)){
+            selectedDishes=selectedMenuItemGuest.get(guestNumber);
+        }
+
+
+        Boolean setCountDish=false;
+
+        for(int i=0;i<selectedDishes.size();i++){
+            if(selectedDishes.get(i).getDishName().contains(dish.getDishName())){
+                if(dish.getDishCount()==0){
+                    selectedDishes.remove(i);
+                }
+                else {
+                    selectedDishes.get(i).setDishCount(dish.getDishCount());
+                }
+                setCountDish = true;
+            }
+        }
+        if(!setCountDish){
+            selectedDishes.add(new DishesSelected(dish.getDishName(),dish.getDishCount(),dish));
+        }
+
+        selectedMenuItemGuest.put(guestNumber,selectedDishes);
+
+
+        for(int i=0;i<selectedDishes.size();i++){
+            Log.d("list of selected item", "dishes name="+selectedDishes.get(i).getDishName()+" count="+selectedDishes.get(i).getDishCount());
+        }
+
+
+        List<DishesSelected> checkList=selectedMenuItemGuest.get(guestNumber);
+        for(int i=0;i<checkList.size();i++){
+            Log.d("list check", "dishes name="+checkList.get(i).getDishName()+" count="+checkList.get(i).getDishCount());
+        }
+
+    }
+
+    // guestCartAdapter
+    // выбор гостя Chip
+    Integer guestNumber;
+    @Override
+    public void onItemClick(int position) {
+        guestNumber=position;
+        for(int i=0;i<guestCount;i++){
+                Chip chip1=(Chip) chipRecyclerView.getChildAt(i);
+                if(i!=position){
+                        chip1.setChecked(false);
+                    }
+                else{
+                        chip1.setChecked(true);
+                    }
+                Log.d("pos----",Integer.toString(position));
+            }
+
+
+        if(selectedMenuItemGuest.containsKey(guestNumber)){
+
+            List<DishesSelected> dishes=selectedMenuItemGuest.get(guestNumber);
+
+            for(int i=0;i<parentModelClassList.size();i++){
+                for(int j=0;j<parentModelClassList.get(i).getDishList().size();j++){
+                    Boolean isContain=false;
+                    for(int k=0;k<dishes.size();k++){
+                        if(parentModelClassList.get(i).getDishList().get(j).getDishName().contains(dishes.get(k).getDishName())){
+                            parentModelClassList.get(i).getDishList().get(j).setDishCount(dishes.get(k).getDishCount());
+                            adapter.notifyDataSetChanged();
+                            isContain=true;
+                            Log.d("contains value",parentModelClassList.get(i).getDishList().get(j).getDishName()+" "+parentModelClassList.get(i).getDishList().get(j).getDishCount());
+
+                        }
+                    }
+                    if(!isContain) {
+                        Log.d("!contains value",parentModelClassList.get(i).getDishList().get(j).getDishName()+" "+parentModelClassList.get(i).getDishList().get(j).getDishCount());
+                        parentModelClassList.get(i).getDishList().get(j).setDishCount(0);
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            }
+        }
+        else{
+            for(int i=0;i<parentModelClassList.size();i++){
+                for(int j=0;j<parentModelClassList.get(i).getDishList().size();j++){
+                    parentModelClassList.get(i).getDishList().get(j).setDishCount(0);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        }
+
+
+
+
+    }
+
+    // guestCartAdapter
+    @Override
+    public void onDeleteCartItemClick2(GuestCart guestCart, int position) {
+
+       //for(int i=0;i<parentModelClassList.size();i++){
+       //    for(int j=0;j<parentModelClassList.get(i).getDishList().size();j++){
+       //        if(parentModelClassList.get(i).getDishList().get(j).getDishName().contains(guestCart.getDishList().get(i).getDishName())){
+       //            parentModelClassList.get(i).getDishList().get(j).setDishCount(guestCart.getDishList().get(i).getDishCount());
+       //            Log.d("--count",Integer.toString(parentModelClassList.get(i).getDishList().get(j).getDishCount()));
+       //            adapter.notifyDataSetChanged();
+       //        }
+       //    }
+       //}
+
+
+        //Log.d("check position",guestCart.getGuestName()+"" );
+        //Log.d("check delete position", guestCarts.get(guestCart.getGuestName()).getDishList().get(position).getDishName());
+//
+        //Log.d("position", position+"");
+        //for(int i=0;i<selectedMenuItemGuest.get(guestCart.getGuestName()).size();i++){
+        //    Log.d("check delete position=", selectedMenuItemGuest.get(guestCart.getGuestName()).get(i).getDishName()+" i="+i);
+//
+        //}
+//
+        //guestCarts.get(guestCart.getGuestName()).getDishList().remove(position);
+        //guestCartAdapter.notifyDataSetChanged();
+//
+        //selectedMenuItemGuest.get(guestCart.getGuestName()).remove(position);
+        //adapter.notifyDataSetChanged();
+
+
+
+    }
+
+
+
+
+    Integer guestCount;
+    Integer tableNumber;
+    String waiter;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if(getArguments()!=null) {
+            guestCount = getArguments().getInt(ARG_PARAM1);
+            tableNumber= getArguments().getInt(ARG_PARAM2);
+            waiter= getArguments().getString(ARG_PARAM3);
+        }
+
+        //Log.d("waiterMenuFragment",waiter);
+    }
+
+
 
     //  поиск по категориям
     public void filterList(String text) {
@@ -227,228 +440,140 @@ public class MenuFragment extends Fragment implements CartAdapter.ItemClickListe
         }
     }
 
+    TextView totalPriceTextView;
 
-    RecyclerView cartRecyclerView;
-    BottomSheetDialog cartBottomSheetDialog;
     // создание Bottom Sheets
     private void createDialog(){
         View view =getLayoutInflater().inflate(R.layout.cart_bottom_sheets,null,false);
 
+        createOrderButton=view.findViewById(R.id.createOrderButton);
+
+//
+       createOrderButton.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+
+
+               HashMap<String,List<String>> list=new HashMap<>();
+               Integer price=0;
+
+               for(int i=0;i<guestCount;i++){
+                   for(int j=0;j<guestCarts.size();j++){
+                       if(guestCarts.get(j).getGuestName().equals(i)){
+                           List<String> dish=new ArrayList<>();
+                           for(int k=0;k<guestCarts.get(j).getDishList().size();k++){
+                               for(int l=0;l<guestCarts.get(j).getDishList().get(k).getDishCount();l++){
+                                   dish.add(guestCarts.get(j).getDishList().get(k).getDishName());
+                                   price+=guestCarts.get(j).getDishList().get(k).getDishPrice();
+                               }
+                           }
+                           list.put(Integer.toString(i),dish);
+                       }
+                   }
+               }
+
+
+               Map<String, Object> order = new HashMap<>();
+               order.put("id", UUID.randomUUID().toString());
+               order.put("table", tableNumber);
+               order.put("price", price);
+               order.put("status", "open");
+               order.put("idWaiter", waiter);
+               order.put("datetime", new Date());
+               order.put("orders", list);
+
+
+
+               // Add a new document with a generated ID
+                db.collection("Orders")
+                        .add(order)
+                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            @Override
+                            public void onSuccess(DocumentReference documentReference) {
+                                Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "Error adding document", e);
+                            }
+                        });
+            }
+        });
+
         cartRecyclerView=view.findViewById(R.id.rv_cart);
         cartBottomSheetDialog=new BottomSheetDialog(getContext());
         cartBottomSheetDialog.setContentView(view);
+        guestCart_rv=(RecyclerView) view.findViewById(R.id.rv_cart);
+        totalPriceTextView=(TextView) view.findViewById(R.id.totalPriceCart);
     }
 
 
 
     public void setInitialData(){
-        breakfastList.add(new Dish(349, "Английский завтрак",R.drawable.img));
-        breakfastList.add(new Dish(319,"Morning plate #1",R.drawable.img_1));
-        breakfastList.add(new Dish(319,"Омлет с фермерским окороком и сыром",R.drawable.img_2));
-        breakfastList.add(new Dish(439,"Омлет с форелью и сливочным сыром",R.drawable.img_3));
-        breakfastList.add(new Dish(279,"Гречка с беконом и яйцом пашот",R.drawable.img_4));
-        breakfastList.add(new Dish(299,"Сырники со сметаной",R.drawable.img_5));
-        breakfastList.add(new Dish(299,"Сырника с соусом крем брюле",R.drawable.img_6));
-        breakfastList.add(new Dish(149,"Блинчики со сливочным маслом",R.drawable.img_7));
-        breakfastList.add(new Dish(149,"Глазунья",R.drawable.img_8));
-        breakfastList.add(new Dish(149,"Каша рисовая",R.drawable.img_9));
-        breakfastList.add(new Dish(149,"Каша овсяная",R.drawable.img_10));
-        breakfastList.add(new Dish(179,"Пшенная каша с тыквой",R.drawable.img_11));
-        breakfastList.add(new Dish(439,"Жареный творог",R.drawable.img_12));
-        breakfastList.add(new Dish(449,"Боул",R.drawable.img_13));
-        breakfastList.add(new Dish(149,"Каша пшенная",R.drawable.img_14));
-        breakfastList.add(new Dish(379,"Гриль сэндвич с курицей",R.drawable.img_15));
+        breakfastList.add(new Dish(349, "Английский завтрак",R.drawable.img,0));
+        breakfastList.add(new Dish(319,"Morning plate #1",R.drawable.img_1,0));
+        breakfastList.add(new Dish(319,"Омлет с фермерским окороком и сыром",R.drawable.img_2,0));
+        breakfastList.add(new Dish(439,"Омлет с форелью и сливочным сыром",R.drawable.img_3,0));
+        breakfastList.add(new Dish(279,"Гречка с беконом и яйцом пашот",R.drawable.img_4,0));
+        breakfastList.add(new Dish(299,"Сырники со сметаной",R.drawable.img_5,0));
+        breakfastList.add(new Dish(299,"Сырника с соусом крем брюле",R.drawable.img_6,0));
+        breakfastList.add(new Dish(149,"Блинчики со сливочным маслом",R.drawable.img_7,0));
+        breakfastList.add(new Dish(149,"Глазунья",R.drawable.img_8,0));
+        breakfastList.add(new Dish(149,"Каша рисовая",R.drawable.img_9,0));
+        breakfastList.add(new Dish(149,"Каша овсяная",R.drawable.img_10,0));
+        breakfastList.add(new Dish(179,"Пшенная каша с тыквой",R.drawable.img_11,0));
+        breakfastList.add(new Dish(439,"Жареный творог",R.drawable.img_12,0));
+        breakfastList.add(new Dish(449,"Боул",R.drawable.img_13,0));
+        breakfastList.add(new Dish(149,"Каша пшенная",R.drawable.img_14,0));
+        breakfastList.add(new Dish(379,"Гриль сэндвич с курицей",R.drawable.img_15,0));
 
 
         parentModelClassList.add(new FoodCategory("Завтраки", breakfastList));
 
-        saladList.add(new Dish(349,"Салат цезарь с куриной грудкой",R.drawable.img_16));
-        saladList.add(new Dish(429,"Салат цезарь с креветками",R.drawable.img_17));
-        saladList.add(new Dish(249,"Салат с паштетом из куриной печени",R.drawable.img_18));
-        saladList.add(new Dish(419,"Салат с пастрами",R.drawable.img_19));
-        saladList.add(new Dish(349,"Салат с печеной свеклой",R.drawable.img_20));
+        saladList.add(new Dish(349,"Салат цезарь с куриной грудкой",R.drawable.img_16,0));
+        saladList.add(new Dish(429,"Салат цезарь с креветками",R.drawable.img_17,0));
+        saladList.add(new Dish(249,"Салат с паштетом из куриной печени",R.drawable.img_18,0));
+        saladList.add(new Dish(419,"Салат с пастрами",R.drawable.img_19,0));
+        saladList.add(new Dish(349,"Салат с печеной свеклой",R.drawable.img_20,0));
 
 
         parentModelClassList.add(new FoodCategory("Салаты", saladList));
 
 
-        mainDishList.add(new Dish(349,"Строганов из индейки с грибами и гречей",R.drawable.img_21));
-        mainDishList.add(new Dish(349,"Оладьи из курицы с картофельным пюре",R.drawable.img_22));
-        mainDishList.add(new Dish(519,"Паста с милиями и креветками",R.drawable.img_23));
-        mainDishList.add(new Dish(349,"Паста Карбонара",R.drawable.img_24));
-        mainDishList.add(new Dish(449,"Киноа с тыквой",R.drawable.img_25));
-        mainDishList.add(new Dish(379,"Жареные сосиски",R.drawable.img_26));
-        mainDishList.add(new Dish(379,"Паста с индейкой, тыквой и печеным баклажаном",R.drawable.img_27));
+        mainDishList.add(new Dish(349,"Строганов из индейки с грибами и гречей",R.drawable.img_21,0));
+        mainDishList.add(new Dish(349,"Оладьи из курицы с картофельным пюре",R.drawable.img_22,0));
+        mainDishList.add(new Dish(519,"Паста с милиями и креветками",R.drawable.img_23,0));
+        mainDishList.add(new Dish(349,"Паста Карбонара",R.drawable.img_24,0));
+        mainDishList.add(new Dish(449,"Киноа с тыквой",R.drawable.img_25,0));
+        mainDishList.add(new Dish(379,"Жареные сосиски",R.drawable.img_26,0));
+        mainDishList.add(new Dish(379,"Паста с индейкой, тыквой и печеным баклажаном",R.drawable.img_27,0));
 
 
         parentModelClassList.add(new FoodCategory("Горячие блюда", mainDishList));
 
-        dessertList.add(new Dish(179,"Пирожное Наполеон",R.drawable.img_28));
-        dessertList.add(new Dish(329,"Тарталетка с клубникой",R.drawable.img_29));
-        dessertList.add(new Dish(379,"Тарталетка с лесными ягодами",R.drawable.img_30));
-        dessertList.add(new Dish(169,"Пирожное Сметанник",R.drawable.img_31));
-        dessertList.add(new Dish(249,"Пирожное Трюфельное",R.drawable.img_32));
-        dessertList.add(new Dish(179,"Пирожное Красный бархат",R.drawable.img_33));
-        dessertList.add(new Dish(69,"Макарон фисташка",R.drawable.img_34));
-        dessertList.add(new Dish(69,"Макарон соленая карамель",R.drawable.img_35));
+        dessertList.add(new Dish(179,"Пирожное Наполеон",R.drawable.img_28,0));
+        dessertList.add(new Dish(329,"Тарталетка с клубникой",R.drawable.img_29,0));
+        dessertList.add(new Dish(379,"Тарталетка с лесными ягодами",R.drawable.img_30,0));
+        dessertList.add(new Dish(169,"Пирожное Сметанник",R.drawable.img_31,0));
+        dessertList.add(new Dish(249,"Пирожное Трюфельное",R.drawable.img_32,0));
+        dessertList.add(new Dish(179,"Пирожное Красный бархат",R.drawable.img_33,0));
+        dessertList.add(new Dish(69,"Макарон фисташка",R.drawable.img_34,0));
+        dessertList.add(new Dish(69,"Макарон соленая карамель",R.drawable.img_35,0));
 
         parentModelClassList.add(new FoodCategory("Десерты", dessertList));
 
-        drinkList.add(new Dish(119,"Вода Байкал газированная",R.drawable.img_36));
-        drinkList.add(new Dish(119,"Вода Жемчужина негазированная",R.drawable.img_37));
-        drinkList.add(new Dish(149,"Морс Бодрый Клубничный",R.drawable.img_38));
-        drinkList.add(new Dish(149,"Морс Бодрый Клюквенный",R.drawable.img_39));
-        drinkList.add(new Dish(149,"Морс Бодрый Клубника-банан",R.drawable.img_40));
-        drinkList.add(new Dish(149,"Морс Бодрый Манго-маракуйя",R.drawable.img_41));
-        drinkList.add(new Dish(149,"Морс Бодрый Ягодный",R.drawable.img_42));
+        drinkList.add(new Dish(119,"Вода Байкал газированная",R.drawable.img_36,0));
+        drinkList.add(new Dish(119,"Вода Жемчужина негазированная",R.drawable.img_37,0));
+        drinkList.add(new Dish(149,"Морс Бодрый Клубничный",R.drawable.img_38,0));
+        drinkList.add(new Dish(149,"Морс Бодрый Клюквенный",R.drawable.img_39,0));
+        drinkList.add(new Dish(149,"Морс Бодрый Клубника-банан",R.drawable.img_40,0));
+        drinkList.add(new Dish(149,"Морс Бодрый Манго-маракуйя",R.drawable.img_41,0));
+        drinkList.add(new Dish(149,"Морс Бодрый Ягодный",R.drawable.img_42,0));
 
         parentModelClassList.add(new FoodCategory("Напитки", drinkList));
 
     }
 
-    @Override
-    public void onItemClick(Dish dish, int position) {
-
-        Log.d("-----del",Integer.toString(position));
-        cartList.remove(position);
-        cartAdapter.notifyDataSetChanged();
-
-    }
-
-    @Override
-    public void onNewItemCount(Dish dish, int position) {
-
-        for(int i=0;i<parentModelClassList.size();i++){
-            for(int j=0;j<parentModelClassList.get(i).getDishList().size();j++){
-                if(parentModelClassList.get(i).getDishList().get(j).getDishName().contains(dish.getDishName())){
-                    parentModelClassList.get(i).getDishList().get(j).setDishCount(dish.getDishCount());
-                    Log.d("--count",Integer.toString(parentModelClassList.get(i).getDishList().get(j).getDishCount()));
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onAddItemClick(Dish dish, int categoryPosition, int dishPosition) {
-
-        List<DishesSelected> list=new ArrayList<>();
-        for (HashMap.Entry<Integer, List<DishesSelected>> entry : dishesSelectedHashMap.entrySet()) {
-            List<DishesSelected> l=entry.getValue();
-            Log.d("lost size", ""+l.size());
-
-            for(int i=0;i<l.size();i++){
-                list.add(new DishesSelected(l.get(i).getPositionParent(),l.get(i).getPositionChild(),l.get(i).getDishCount()));
-            }
-
-            //for(int i=0;i<l.size();i++){
-            //    Log.d("=====", l.get(i).getPositionParent()+"="+categoryPosition+"  "+l.get(i).getPositionChild()+"="+dishPosition);
-            //    if(l.get(i).getPositionParent()!=categoryPosition && l.get(i).getPositionChild()!=dishPosition){
-            //        list.add(new DishesSelected(l.get(i).getPositionParent(),l.get(i).getPositionChild(),l.get(i).getDishCount()));
-            //    }
-            //}
-        }
-
-        for(int i=0;i<parentModelClassList.size();i++){
-            for(int j=0;j<parentModelClassList.get(i).getDishList().size();j++){
-                if(parentModelClassList.get(i).getDishList().get(j).getDishName().contains(dish.getDishName())){
-                    list.add(new DishesSelected(i,j,parentModelClassList.get(i).getDishList().get(j).getDishCount()));
-                    dishesSelectedHashMap.put(guestNumber,list);
-                    Log.d("-----poi",i+" "+j+" "+parentModelClassList.get(i).getDishList().get(j).getDishCount());
-                }
-            }
-        }
-
-        for (HashMap.Entry<Integer, List<DishesSelected>> entry : dishesSelectedHashMap.entrySet()) {
-
-            List<DishesSelected> l=entry.getValue();
-            for(int i=0;i<l.size();i++){
-                Log.d("----qwer", entry.getKey()+" "+ l.get(i).getPositionParent()+" "+l.get(i).getPositionChild()+" "+l.get(i).getDishCount());
-            }
-        }
-
-
-        boolean isContain=false;
-        for(int i=0;i<cartList.size();i++){
-            if(dish.getDishName().contains(cartList.get(i).getDishName())){
-                Integer count=cartList.get(i).getDishCount();
-                cartList.get(i).setDishCount(count);
-                isContain=true;
-
-                guestCarts.add(new GuestCart("Гость 1", cartList));
-            }
-        }
-        if(!isContain){
-            cartList.add(dish);
-        }
-
-
-    }
-
-    Integer guestCount;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if(getArguments()!=null) {
-            guestCount = getArguments().getInt(ARG_PARAM1);
-        }
-    }
-
-
-    Integer guestNumber;
-    @Override
-    public void onItemClick(int position) {
-        guestNumber=position;
-        for(int i=0;i<guestCount;i++){
-            Chip chip1=(Chip) chipRecyclerView.getChildAt(i);
-            if(i!=position){
-                chip1.setChecked(false);
-            }
-            else{
-                chip1.setChecked(true);
-            }
-            Log.d("pos----",Integer.toString(position));
-        }
-
-        for (HashMap.Entry<Integer, List<DishesSelected>> entry : dishesSelectedHashMap.entrySet()) {
-            Log.d("entry key and position",entry.getKey()+" "+position);
-            if(entry.getKey()==position){
-                List<DishesSelected> list=entry.getValue();
-                Log.d("list size",list.size()+"");
-                for(int i=0;i<list.size();i++){
-                    parentModelClassList.get(list.get(i).getPositionParent()).getDishList()
-                            .get(list.get(i).getPositionChild())
-                            .setDishCount(list.get(i).getDishCount());
-                    Log.d("set count",parentModelClassList.get(list.get(i).getPositionParent()).getDishList()
-                            .get(list.get(i).getPositionChild()).getDishCount()+"");
-                    adapter.notifyDataSetChanged();
-                }
-            }
-
-            else{
-                for(int i=0;i<parentModelClassList.size();i++){
-                    for(int j=0;j<parentModelClassList.get(i).getDishList().size();j++){
-                        parentModelClassList.get(i).getDishList().get(j).setDishCount(0);
-                        adapter.notifyDataSetChanged();
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onAddItemClick(GuestCart guestCart, int position) {
-
-       //for(int i=0;i<parentModelClassList.size();i++){
-       //    for(int j=0;j<parentModelClassList.get(i).getDishList().size();j++){
-       //        if(parentModelClassList.get(i).getDishList().get(j).getDishName().contains(guestCart.getDishList().get(i).getDishName())){
-       //            parentModelClassList.get(i).getDishList().get(j).setDishCount(guestCart.getDishList().get(i).getDishCount());
-       //            Log.d("--count",Integer.toString(parentModelClassList.get(i).getDishList().get(j).getDishCount()));
-       //            adapter.notifyDataSetChanged();
-       //        }
-       //    }
-       //}
-    }
 }

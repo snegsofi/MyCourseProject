@@ -5,96 +5,105 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     app:cardCornerRadius="20dp">
-    
-    <LinearLayout
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/cart"
-            android:textAlignment="center"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginTop="20dp"
-            android:textColor="@color/black"/>
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/rv_cart"
-            />
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="right"
-            android:layout_marginTop="40dp"
-            android:layout_marginBottom="10dp">
+            android:orientation="vertical">
+
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:text="price"
-                android:gravity="right"
-                android:textSize="20dp"
+                android:text="@string/cart"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp"
+                android:textColor="@color/black"/>
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/rv_cart"
                 />
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/totalPriceCart"
-                android:layout_weight="1"
-                android:text="total"
-                android:layout_marginRight="20dp"
-                android:layout_marginLeft="20dp"
-                android:textColor="@color/black"
-                android:textSize="22dp"/>
+                android:orientation="horizontal"
+                android:layout_gravity="right"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="10dp">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:text="price"
+                    android:gravity="right"
+                    android:textSize="20dp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/totalPriceCart"
+                    android:layout_weight="1"
+                    android:text="total"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:textColor="@color/black"
+                    android:textSize="22dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="right"
+                android:layout_marginBottom="20dp">
+
+
+                <Button
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    android:id="@+id/createOrderButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/createOrder"
+                    android:layout_gravity="center"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/orange"
+                    android:textSize="20dp"
+                    android:layout_marginRight="10dp"
+                    />
+
+                <Button
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    android:id="@+id/payButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pay"
+                    android:layout_gravity="center"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/orange"
+                    android:textSize="20dp"
+                    android:layout_marginRight="20dp"
+
+                    />
+
+            </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="20dp"
-            android:layout_gravity="right"
-            android:layout_marginBottom="20dp">
 
-            <Button
-                style="@style/Widget.Material3.Button.ElevatedButton"
-                android:id="@+id/createOrderButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/createOrder"
-                android:layout_gravity="center"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/orange"
-                android:textSize="20dp"
-                android:layout_marginRight="10dp"
-                />
-
-            <Button
-                style="@style/Widget.Material3.Button.ElevatedButton"
-                android:id="@+id/payButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/pay"
-                android:layout_gravity="center"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/orange"
-                android:textSize="20dp"
-                android:layout_marginRight="20dp"
-
-                />
-
-        </LinearLayout>
-    </LinearLayout>
+    </ScrollView>
 
 </androidx.cardview.widget.CardView>
+

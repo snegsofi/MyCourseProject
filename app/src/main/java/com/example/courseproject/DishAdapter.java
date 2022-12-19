@@ -49,8 +49,9 @@ public class DishAdapter extends RecyclerView.Adapter<DishAdapter.ViewHolder> {
 
         ImageButton removeButton= holder.removeButton;
         ImageButton addButton= holder.addButton;
-        TextView count= holder.countDishTextView;
 
+        TextView count= holder.countDishTextView;
+        count.setText(Integer.toString(dish.getDishCount()));
 
 
         removeButton.setOnClickListener(new View.OnClickListener() {

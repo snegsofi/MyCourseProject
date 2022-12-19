@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import java.util.Locale;
 
 public class FoodCategoryAdapter extends RecyclerView.Adapter<FoodCategoryAdapter.ViewHolder> {
 
@@ -23,6 +24,13 @@ public class FoodCategoryAdapter extends RecyclerView.Adapter<FoodCategoryAdapte
         this.foodCategories = foodCategoryList;
         this.clickListener=clickListener;
     }
+
+    public void dataChanged(List<FoodCategory> foodCategoryList){
+
+        foodCategories = foodCategoryList;
+        notifyDataSetChanged();
+    }
+
 
     @NonNull
     @Override
@@ -90,4 +98,6 @@ public class FoodCategoryAdapter extends RecyclerView.Adapter<FoodCategoryAdapte
     public interface ItemClickListener{
         void onAddItemClick(Dish dish, int categoryPosition, int dishPosition);
     }
+
+
 }

@@ -41,11 +41,13 @@ public class Dish {
         this.DishPhoto = dishPhoto;
     }
 
-    public Dish(int dishPrice, String dishName, int dishPhoto) {
+    public Dish(int dishPrice, String dishName, int dishPhoto,int dishCount) {
         DishPrice = dishPrice;
         DishName = dishName;
         DishPhoto=dishPhoto;
+        DishCount=dishCount;
     }
+
     public Dish() {
     }
 

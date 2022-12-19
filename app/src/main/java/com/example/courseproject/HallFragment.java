@@ -53,10 +53,36 @@ public class HallFragment extends Fragment {
 
     }
 
+    private static final String ARG_PARAM1="param1";
     HashMap<Integer,Boolean> tables;
+
+    public static HallFragment newInstance(String waiter)
+    {
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1,waiter);
+        HallFragment fragment = new HallFragment();
+        fragment.setArguments(args);
+        return fragment;
+
+    }
+
     public static HallFragment newInstance()
     {
         return new HallFragment();
+
+    }
+
+    String waiter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if(getArguments()!=null) {
+            waiter = getArguments().getString(ARG_PARAM1);
+        }
+
+        //Log.d("waiterHallFragment",waiter);
     }
 
     @Nullable
@@ -78,6 +104,10 @@ public class HallFragment extends Fragment {
         tableList.add(view.findViewById(R.id.imageButton10));
         tableList.add(view.findViewById(R.id.imageButton11));
 
+        for(int i=0;i< tableList.size();i++){
+            tableList.get(i).setBackgroundColor(getResources().getColor(R.color.grey));
+            buttonPress(tableList.get(i), (i+1),waiter);
+        }
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -87,6 +117,57 @@ public class HallFragment extends Fragment {
 
         return view;
     }
+
+    public void buttonPress(ImageButton table, Integer tableNumber, String waiter){
+        table.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ColorDrawable tableColor = (ColorDrawable) table.getBackground();
+                if(tableColor.getColor()==getResources().getColor(R.color.orange)){
+                    table.setBackgroundColor(getResources().getColor(R.color.grey));
+                }
+                else{
+                    table.setBackgroundColor(getResources().getColor(R.color.orange));
+                    showDialog(tableNumber,waiter);
+                }
+            }
+        });
+    }
+
+    public void showDialog(Integer tableNumber,String waiter){
+        AlertDialog.Builder builder=new AlertDialog.Builder(getContext());
+        builder.setTitle("Введите количество гостей");
+
+        View showDialogView=getLayoutInflater().inflate(R.layout.custom_dialog,null);
+        EditText eCount;
+        eCount=showDialogView.findViewById(R.id.countGuest_EditText);
+        Button submit=showDialogView.findViewById(R.id.addGuest_Button);
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!eCount.getText().toString().isEmpty()){
+                    Integer guestCount=Integer.parseInt(eCount.getText().toString());
+                    setFragment(guestCount,tableNumber, waiter);
+                    alertDialog.dismiss();
+                }
+            }
+        });
+        builder.setView(showDialogView);
+        alertDialog=builder.create();
+        alertDialog.show();
+    }
+
+    public void setFragment(int guestCount, int tableNumber, String waiter){
+        Fragment fragment=MenuFragment.newInstance(guestCount, tableNumber, waiter);
+
+        FragmentManager fragmentManager=getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager
+                .beginTransaction();
+        fragmentTransaction.replace(R.id.fl_content, fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
 
     private void readData(){
 
@@ -105,7 +186,6 @@ public class HallFragment extends Fragment {
                                         Boolean.parseBoolean(document.get("isBusy").toString()));
 ////
 
-
                                 Log.d(TAG,"Id="+document.get("Id").toString());
                             }
                         } else {
@@ -121,6 +201,7 @@ public class HallFragment extends Fragment {
                                 if(i==entry.getKey()){
                                     if(entry.getValue()){
                                         tableList.get(i).setBackgroundColor(getResources().getColor(R.color.orange));
+                                        tableList.get(i).setEnabled(false);
                                     }
                                     else{
                                         tableList.get(i).setBackgroundColor(getResources().getColor(R.color.grey));

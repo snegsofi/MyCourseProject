@@ -39,16 +39,16 @@ public class GuestCartAdapter extends RecyclerView.Adapter<GuestCartAdapter.View
     @Override
     public void onBindViewHolder(@NonNull GuestCartAdapter.ViewHolder holder, int position) {
 
-        holder.guestNameTextView.setText(guestCarts.get(position).getGuestName());
+        holder.guestNameTextView.setText(Integer.toString(guestCarts.get(position).getGuestName()));
 
         adapter=new CartAdapter(context, guestCarts.get(position).getDishList(), new CartAdapter.ItemClickListener() {
             @Override
-            public void onItemClick(Dish dish, int position) {
-                clickListener.onAddItemClick(guestCarts.get(position), holder.getAdapterPosition());
+            public void onDeleteCartItemClick(Dish dish, int position) {
+                clickListener.onDeleteCartItemClick2(guestCarts.get(position), holder.getAdapterPosition());
             }
 
             @Override
-            public void onNewItemCount(Dish dish, int position) {
+            public void onNewCartItemCount(Dish dish, int position) {
 
             }
         });
@@ -91,7 +91,7 @@ public class GuestCartAdapter extends RecyclerView.Adapter<GuestCartAdapter.View
     private ItemClickListener clickListener;
 
     public interface ItemClickListener{
-        void onAddItemClick(GuestCart guestCart, int position);
+        void onDeleteCartItemClick2(GuestCart guestCart, int position);
     }
 }
 

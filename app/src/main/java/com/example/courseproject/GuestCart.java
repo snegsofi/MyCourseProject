@@ -3,14 +3,14 @@ package com.example.courseproject;
 import java.util.List;
 
 public class GuestCart {
-    private String guestName;
+    private Integer guestName;
     private List<Dish> dishList;
 
-    public String getGuestName() {
+    public Integer getGuestName() {
         return guestName;
     }
 
-    public void setGuestName(String guestName) {
+    public void setGuestName(Integer guestName) {
         this.guestName = guestName;
     }
 
@@ -22,7 +22,7 @@ public class GuestCart {
         this.dishList = dishList;
     }
 
-    public GuestCart(String guestName, List<Dish> dishList) {
+    public GuestCart(Integer guestName, List<Dish> dishList) {
         this.guestName = guestName;
         this.dishList = dishList;
     }

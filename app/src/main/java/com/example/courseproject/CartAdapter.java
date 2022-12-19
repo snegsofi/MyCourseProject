@@ -69,7 +69,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     textView.setText(Integer.toString(dish.getDishPrice()));
                 }
                 else{
-                    clickListener.onItemClick(dish, holder.getAdapterPosition());
+                    clickListener.onDeleteCartItemClick(dish, holder.getAdapterPosition());
                 }
             }
         });
@@ -86,14 +86,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                 dish.setDishPrice(newPrice);
                 textView.setText(Integer.toString(dish.getDishPrice()));
 
-                clickListener.onNewItemCount(dish, holder.getAdapterPosition());
+                clickListener.onNewCartItemCount(dish, holder.getAdapterPosition());
             }
         });
 
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                clickListener.onItemClick(dish, holder.getAdapterPosition());
+                clickListener.onDeleteCartItemClick(dish, holder.getAdapterPosition());
             }
         });
     }
@@ -129,8 +129,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     private ItemClickListener clickListener;
 
     public interface ItemClickListener{
-        void onItemClick(Dish dish, int position);
-        void onNewItemCount(Dish dish,int position);
+        void onDeleteCartItemClick(Dish dish, int position);
+        void onNewCartItemCount(Dish dish,int position);
     }
 
 }

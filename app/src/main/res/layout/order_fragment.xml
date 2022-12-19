@@ -7,20 +7,18 @@
     android:orientation="vertical">
 
 
-    <ViewStub
-        android:id="@+id/emptyStateLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout="@layout/empty_order_state"
-        android:visibility="gone"/>
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1" >
 
-
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/rv_order"
+            android:layout_margin="15dp"
+            />
+    </FrameLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/newOrder_Button"
@@ -35,3 +33,17 @@
         android:src="@drawable/plus" />
 
 </LinearLayout>
+
+<!--<ViewStub-->
+<!--android:id="@+id/emptyStateLayout"-->
+<!--android:layout_width="wrap_content"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:layout_gravity="center"-->
+<!--android:layout="@layout/empty_order_state"-->
+<!--android:visibility="gone"/>-->
+<!---->
+<!---->
+<!--<FrameLayout-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="0dp"-->
+<!--android:layout_weight="1" />-->

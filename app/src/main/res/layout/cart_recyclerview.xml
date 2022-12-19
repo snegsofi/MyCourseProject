@@ -76,7 +76,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Price"
-            android:layout_marginLeft="50dp"
+            android:layout_marginLeft="30dp"
             android:textSize="20dp"
             android:layout_gravity="center" />
 
@@ -94,12 +94,9 @@
             android:src="@drawable/delete"
             android:layout_gravity="center"
             android:id="@+id/delete_ButtonCart"
-            android:background="@color/white"
-            android:layout_marginLeft="30dp"
+            android:background="@color/grey"
+            android:layout_marginLeft="10dp"
             />
-
-
-
 
 
     </LinearLayout>
