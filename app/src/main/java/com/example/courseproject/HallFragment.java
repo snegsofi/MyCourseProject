@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -33,9 +34,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.net.Inet4Address;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class HallFragment extends Fragment {
 
@@ -147,7 +150,7 @@ public class HallFragment extends Fragment {
             public void onClick(View view) {
                 if(!eCount.getText().toString().isEmpty()){
                     Integer guestCount=Integer.parseInt(eCount.getText().toString());
-                    setFragment(guestCount,tableNumber, waiter);
+                    setFragment(guestCount,(tableNumber-1), waiter);
                     alertDialog.dismiss();
                 }
             }
@@ -167,6 +170,9 @@ public class HallFragment extends Fragment {
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
+
+
+
 
 
     private void readData(){
@@ -207,11 +213,8 @@ public class HallFragment extends Fragment {
                                         tableList.get(i).setBackgroundColor(getResources().getColor(R.color.grey));
                                     }
                                 }
-
                             }
-
                         }
-
                     }
                 });
         //return tables;

@@ -27,13 +27,25 @@ import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.nio.channels.SelectableChannel;
 import java.util.ArrayList;
@@ -109,6 +121,8 @@ public class MenuFragment extends Fragment implements
 
     public void initialComponent(View view){
 
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         backOrderButton=view.findViewById(R.id.backOrderButton);
         toCartButton=view.findViewById(R.id.toCart_Button);
         searchView=view.findViewById(R.id.searchView);
@@ -499,6 +513,8 @@ public class MenuFragment extends Fragment implements
                                 Log.w(TAG, "Error adding document", e);
                             }
                         });
+
+                setTableChecked(tableNumber);
             }
         });
 
@@ -509,6 +525,51 @@ public class MenuFragment extends Fragment implements
         totalPriceTextView=(TextView) view.findViewById(R.id.totalPriceCart);
     }
 
+    private DatabaseReference mDatabase;
+
+    private void setTableChecked(Integer selectedTable){
+
+        Map<String, Object> table = new HashMap<>();
+        table.put("isBusy", true);
+
+        Log.d("selected table number", selectedTable+"");
+
+        db.collection("Tables")
+                .whereEqualTo("Id", selectedTable)
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if(task.isSuccessful() && !task.getResult().isEmpty()){
+
+                            DocumentSnapshot documentSnapshot=task.getResult().getDocuments().get(0);
+                            String documentID= documentSnapshot.getId();
+
+                            db.collection("Tables")
+                                    .document(documentID)
+                                    .update(table)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            Log.d("Update table", "Successful update");
+
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.d("Update table", "Failed update "+e.toString());
+
+                                        }
+                                    });
+                        }
+                        else{
+                            Log.d("Update table", "Some failed");
+                        }
+                    }
+                });
+
+    }
 
 
     public void setInitialData(){

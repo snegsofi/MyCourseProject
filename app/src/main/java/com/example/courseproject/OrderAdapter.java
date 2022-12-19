@@ -8,9 +8,18 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,29 +57,64 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
 
 
         String dishes="";
-        List<String> dishList=new ArrayList<>();
-        HashMap<String,Integer> dishHashMap=new HashMap<>();
-        for (Map.Entry<String, List<String>> entry : order.getOrders().entrySet()) {
-            dishList.add(entry.getValue().toString());
-        }
 
-        for(int i=0;i<dishList.size();i++){
-            if(i<(dishList.size()-1)){
-                if(dishList.get(i).contains(dishList.get(i+1))){
-                    dishHashMap.put(dishList.get(i),(dishHashMap.get(i)+1));
+        HashMap<String,HashMap<String,Integer>> dishMap=new HashMap<>();
+        for (Map.Entry<String, List<String>> entry : order.getOrders().entrySet()) {
+
+            Log.d("order key", entry.getKey());
+            Log.d("order value", entry.getValue().toString());
+
+
+
+            HashMap<String,Integer> dishHashMap=new HashMap<>();
+            List<String> list=new ArrayList<>();
+            for(int i=0;i<entry.getValue().size();i++){
+                if(!list.contains(entry.getValue().get(i))){
+                    list.add(entry.getValue().get(i));
+                    dishHashMap.put(entry.getValue().get(i),1);
+
+                    Log.d("map value 1",entry.getValue().get(i)+" 1" );
                 }
                 else{
-                    dishHashMap.put(dishList.get(i),1);
+                    dishHashMap.put(entry.getValue().get(i),dishHashMap.get(entry.getValue().get(i))+1);
+
+                    Log.d("map value 1",entry.getValue().get(i)+" "+(dishHashMap.get(entry.getValue().get(i))+1));
                 }
             }
+
+            dishMap.put(entry.getKey(),dishHashMap);
+
+
         }
 
-        for (Map.Entry<String, Integer> entry : dishHashMap.entrySet()) {
-            dishes+=entry.getKey()+" x "+entry.getValue();
+
+        for (Map.Entry<String,HashMap<String,Integer>> entry : dishMap.entrySet()) {
+
+
+            Log.d("key", entry.getKey());
+
+            dishes+="Гость "+entry.getKey();
+            dishes+="\n";
+
+            HashMap<String,Integer> dishHashMap=entry.getValue();
+            for (Map.Entry<String,Integer> entry1 : dishHashMap.entrySet()) {
+                dishes+=entry1.getValue()+" x "+entry1.getKey();
+                dishes+="\n";
+            }
+
         }
 
         TextView textView4 = holder.dishesOrderTextView;
         textView4.setText(dishes);
+
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setTableChecked(order.getTable());
+                setOrderStatus(order.getId());
+            }
+        });
 
     }
 
@@ -91,6 +135,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
         public ViewHolder(View itemView) {
             super(itemView);
 
+            db = FirebaseFirestore.getInstance();
             dateOrderTextView = (TextView) itemView.findViewById(R.id.dateOrder);
             tableOrderTextView = (TextView) itemView.findViewById(R.id.tableOrder);
             priceOrderTextView=(TextView) itemView.findViewById(R.id.priceOrder);
@@ -118,6 +163,92 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
         void onItemClick(Order order, int position);
     }
 
+    private FirebaseFirestore db;
+    private void setTableChecked(Integer selectedTable){
+
+        Map<String, Object> table = new HashMap<>();
+        table.put("isBusy", false);
+
+        Log.d("selected table number", selectedTable+"");
+
+        db.collection("Tables")
+                .whereEqualTo("Id", selectedTable)
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if(task.isSuccessful() && !task.getResult().isEmpty()){
+
+                            DocumentSnapshot documentSnapshot=task.getResult().getDocuments().get(0);
+                            String documentID= documentSnapshot.getId();
+
+                            db.collection("Tables")
+                                    .document(documentID)
+                                    .update(table)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            Log.d("Update table", "Successful update");
+
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.d("Update table", "Failed update "+e.toString());
+
+                                        }
+                                    });
+                        }
+                        else{
+                            Log.d("Update table", "Some failed");
+                        }
+                    }
+                });
+
+    }
+
+    private void setOrderStatus(String id){
+
+        Map<String, Object> status = new HashMap<>();
+        status.put("status", "close");
+
+        db.collection("Orders")
+                .whereEqualTo("id", id)
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if(task.isSuccessful() && !task.getResult().isEmpty()){
+
+                            DocumentSnapshot documentSnapshot=task.getResult().getDocuments().get(0);
+                            String documentID= documentSnapshot.getId();
+
+                            db.collection("Orders")
+                                    .document(documentID)
+                                    .update(status)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            Log.d("Update status", "Successful update");
+
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.d("Update status", "Failed update "+e.toString());
+
+                                        }
+                                    });
+                        }
+                        else{
+                            Log.d("Update status", "Some failed");
+                        }
+                    }
+                });
+
+    }
 
 
 }

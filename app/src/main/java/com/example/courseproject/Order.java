@@ -13,6 +13,7 @@ public class Order {
     private String status;
     private Date datetime;
     private HashMap<String,List<String>> orders;
+    //private List<GuestCart> orders;
     private String idWaiter;
 
     public String getStatus() {
@@ -31,11 +32,11 @@ public class Order {
         this.datetime= datetime;
     }
 
-    public HashMap<String,List<String>> getOrders() {
+    public  HashMap<String,List<String>> getOrders() {
         return orders;
     }
 
-    public void setOrders(HashMap<String,List<String>> orders) {
+    public void setOrders( HashMap<String,List<String>> orders) {
         this.orders = orders;
     }
 
@@ -71,7 +72,7 @@ public class Order {
         this.price = price;
     }
 
-    public Order(String  id, Integer table, Integer price, String status, Date datetime, HashMap<String,List<String>> orders) {
+    public Order(String  id, Integer table, Integer price, String status, Date datetime,  HashMap<String,List<String>> orders) {
         this.id = id;
         this.table = table;
         this.price = price;
