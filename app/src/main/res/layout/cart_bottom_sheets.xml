@@ -45,7 +45,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
-                    android:text="price"
+                    android:text="Общая стоимость:"
                     android:gravity="right"
                     android:textSize="20dp"
                     />
@@ -56,8 +56,16 @@
                     android:id="@+id/totalPriceCart"
                     android:layout_weight="1"
                     android:text="total"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginRight="2dp"
                     android:layout_marginLeft="20dp"
+                    android:textColor="@color/black"
+                    android:textSize="22dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="₽"
+                    android:layout_marginRight="20dp"
                     android:textColor="@color/black"
                     android:textSize="22dp"/>
 

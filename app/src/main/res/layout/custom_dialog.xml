@@ -16,7 +16,8 @@
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:backgroundTint="@color/white"
-            android:id="@+id/countGuest_EditText"/>
+            android:id="@+id/countGuest_EditText"
+            android:inputType="number"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 

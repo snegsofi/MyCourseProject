@@ -2,6 +2,7 @@ package com.example.courseproject;
 
 import android.graphics.Color;
 import android.graphics.drawable.AnimatedVectorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -30,12 +32,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class OrderFragment extends Fragment implements OrderAdapter.ItemClickListener{
@@ -56,6 +62,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.ItemClickLis
         args.putString(ARG_PARAM1,waiter);
         OrderFragment fragment = new OrderFragment();
         fragment.setArguments(args);
+        Log.d("waiterOrderFragment",waiter);
         return fragment;
 
     }
@@ -85,12 +92,6 @@ public class OrderFragment extends Fragment implements OrderAdapter.ItemClickLis
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.order_fragment,container,false);
 
-        //emptyLayout=(ViewStub) view.findViewById(R.id.emptyStateLayout);
-        //if(orderEmpty==0){
-        //    emptyLayout.inflate();
-        //}
-
-
         guestCarts=new ArrayList<>();
         db = FirebaseFirestore.getInstance();
         orders_rv=view.findViewById(R.id.rv_order);
@@ -100,7 +101,6 @@ public class OrderFragment extends Fragment implements OrderAdapter.ItemClickLis
             public void onClick(View view) {
                 Fragment hallFragment=HallFragment.newInstance(waiter);
 
-                // HallFragment hallFragment=new HallFragment();
                 FragmentManager fragmentManager=getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager
                         .beginTransaction();
@@ -132,6 +132,7 @@ public class OrderFragment extends Fragment implements OrderAdapter.ItemClickLis
     public void initialArray(){
 
         db.collection("Orders")
+                .whereEqualTo("idWaiter",waiter)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -144,8 +145,12 @@ public class OrderFragment extends Fragment implements OrderAdapter.ItemClickLis
                                 Order order=document.toObject(Order.class);
                                 orders.add(order);
 
+
+                                List<Order> sortedByDate=sortedOrder(orders);
+                                List<Order> sortedList=sortedByStatusOrder(sortedByDate);
+
                                 // Создание адаптера
-                                adapter = new OrderAdapter(getContext(), orders,OrderFragment.this);
+                                adapter = new OrderAdapter(getContext(), sortedList,OrderFragment.this);
                                 // размещение элементов
                                 orders_rv.setLayoutManager(new LinearLayoutManager(getContext()));
                                 // Прикрепрепляем адаптер к recyclerView
@@ -161,4 +166,54 @@ public class OrderFragment extends Fragment implements OrderAdapter.ItemClickLis
                 });
 
     }
+
+
+    public List<Order> sortedOrder(List<Order> list){
+        Map<Integer,Date> orderMap=new HashMap<>();
+        for(int i=0;i<list.size();i++){
+            orderMap.put(i,list.get(i).getDatetime());
+        }
+
+
+        LinkedHashMap<Integer,Date> sortedOrder= null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            sortedOrder = orderMap.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .collect(LinkedHashMap::new,
+                            (m, c) -> m.put(c.getKey(), c.getValue()),
+                            LinkedHashMap::putAll);
+        }
+
+
+        List<Order> orderList=new ArrayList<>();
+        for (Map.Entry<Integer, Date> entry : sortedOrder.entrySet()) {
+            orderList.add(list.get(entry.getKey()));
+        }
+
+        return orderList;
+
+    }
+
+    public List<Order> sortedByStatusOrder(List<Order> list){
+
+        List<Order> sortedList=new ArrayList<>();
+
+        for(int i=0;i<list.size();i++){
+            if(list.get(i).getStatus().contains("open")){
+                sortedList.add(list.get(i));
+            }
+        }
+
+        for(int i=0;i<list.size();i++){
+            if(list.get(i).getStatus().contains("close")){
+                sortedList.add(list.get(i));
+            }
+        }
+
+        return sortedList;
+
+    }
+
+
+
 }

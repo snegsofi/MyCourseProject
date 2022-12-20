@@ -211,7 +211,7 @@ public class SignUpActivity extends AppCompatActivity {
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             updateUI(user);
-                            toNewActivity();
+                            toNewActivity(email);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -229,8 +229,10 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
-    private void toNewActivity(){
+    private void toNewActivity(String waiter){
         Intent intent=new Intent(SignUpActivity.this,MainActivity.class);
+        intent.putExtra("waiter", waiter);
+        Log.d("waiterSignInActivity",waiter);
         startActivity(intent);
     }
 

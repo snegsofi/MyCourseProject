@@ -125,6 +125,7 @@ public class HallFragment extends Fragment {
         table.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 ColorDrawable tableColor = (ColorDrawable) table.getBackground();
                 if(tableColor.getColor()==getResources().getColor(R.color.orange)){
                     table.setBackgroundColor(getResources().getColor(R.color.grey));
@@ -148,7 +149,7 @@ public class HallFragment extends Fragment {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!eCount.getText().toString().isEmpty()){
+                if(!eCount.getText().toString().isEmpty() && Integer.parseInt(eCount.getText().toString())>0){
                     Integer guestCount=Integer.parseInt(eCount.getText().toString());
                     setFragment(guestCount,(tableNumber-1), waiter);
                     alertDialog.dismiss();

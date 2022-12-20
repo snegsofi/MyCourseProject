@@ -49,7 +49,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
         TextView textView = holder.dateOrderTextView;
         textView.setText(new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(order.getDatetime()));
         TextView textView1 = holder.tableOrderTextView;
-        textView1.setText(Integer.toString(order.getTable()));
+        textView1.setText(Integer.toString(order.getTable()+1));
         TextView textView2 = holder.priceOrderTextView;
         textView2.setText(Integer.toString(order.getPrice()));
         TextView textView3 = holder.statusOrderTextView;
@@ -93,7 +93,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
 
             Log.d("key", entry.getKey());
 
-            dishes+="Гость "+entry.getKey();
+            dishes+="\n";
+            dishes+="Гость "+(Integer.parseInt(entry.getKey())+1);
             dishes+="\n";
 
             HashMap<String,Integer> dishHashMap=entry.getValue();
@@ -113,6 +114,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
             public void onClick(View view) {
                 setTableChecked(order.getTable());
                 setOrderStatus(order.getId());
+                Toast.makeText(view.getContext(), "Заказ закрыт",
+                        Toast.LENGTH_LONG).show();
             }
         });
 

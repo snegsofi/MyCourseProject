@@ -21,9 +21,11 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()){
                 case R.id.navigation_home:
-                    loadFragment(HomeFragment.newInstance());
+                    loadFragment(HomeFragment.newInstance(waiter));
                     return true;
                 case R.id.navigation_order:
+                    Intent intent=getIntent();
+                    waiter = intent.getStringExtra("waiter");
                     loadFragment(OrderFragment.newInstance(waiter));
                     return true;
                 case R.id.navigation_notifications:

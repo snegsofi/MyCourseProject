@@ -1,5 +1,6 @@
 package com.example.courseproject;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,20 +38,26 @@ public class GuestCartAdapter extends RecyclerView.Adapter<GuestCartAdapter.View
 
     CartAdapter adapter;
     @Override
-    public void onBindViewHolder(@NonNull GuestCartAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull GuestCartAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
 
         holder.guestNameTextView.setText(Integer.toString(guestCarts.get(position).getGuestName()));
 
         adapter=new CartAdapter(context, guestCarts.get(position).getDishList(), new CartAdapter.ItemClickListener() {
             @Override
-            public void onDeleteCartItemClick(Dish dish, int position) {
-                clickListener.onDeleteCartItemClick2(guestCarts.get(position), holder.getAdapterPosition());
+            public void onDeleteCartItemClick(Dish dish, int positionDish) {
+                clickListener.onDeleteCartItemClick2(guestCarts.get(position), holder.getAdapterPosition(), positionDish);
             }
 
             @Override
-            public void onNewCartItemCount(Dish dish, int position) {
-
+            public void onNewCartItemCount(Dish dish, int positionDish) {
+                clickListener.onNewCartItemCount2(guestCarts.get(position),holder.getAdapterPosition(),positionDish);
             }
+
+            @Override
+            public void onRemoveCartItemCount(Dish dish, int positionDish) {
+                clickListener.onRemoveCartItemCount2(guestCarts.get(position),holder.getAdapterPosition(),positionDish);
+            }
+
         });
 
         // размещение элементов
@@ -91,7 +98,9 @@ public class GuestCartAdapter extends RecyclerView.Adapter<GuestCartAdapter.View
     private ItemClickListener clickListener;
 
     public interface ItemClickListener{
-        void onDeleteCartItemClick2(GuestCart guestCart, int position);
+        void onDeleteCartItemClick2(GuestCart guestCart, int position, int positionDish);
+        void onNewCartItemCount2(GuestCart guestCart,int position, int positionDish);
+        void onRemoveCartItemCount2(GuestCart guestCart,int position, int positionDish);
     }
 }
 

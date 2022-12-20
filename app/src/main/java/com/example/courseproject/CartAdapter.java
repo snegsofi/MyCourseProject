@@ -48,8 +48,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         imageView.setImageResource(dish.getDishPhoto());
         TextView count= holder.countDishTextView;
         count.setText(Integer.toString(dish.getDishCount()));
-        TextView textView = holder.priceDishTextView;
-        textView.setText(Integer.toString(dish.getDishPrice()));
+        TextView price = holder.priceDishTextView;
+        price.setText(Integer.toString(dish.getDishPrice()));
 
         ImageButton removeButton= holder.removeButton;
         ImageButton addButton= holder.addButton;
@@ -60,13 +60,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 if(Integer.parseInt(count.getText().toString())>1){
-                    int countDish=Integer.parseInt(count.getText().toString());
-                    countDish--;
-                    count.setText(Integer.toString(countDish));
 
-                    int newPrice=dish.getDishPrice()-(dish.getDishPrice()/(countDish+1));
-                    dish.setDishPrice(newPrice);
-                    textView.setText(Integer.toString(dish.getDishPrice()));
+                    clickListener.onRemoveCartItemCount(dish, holder.getAdapterPosition());
                 }
                 else{
                     clickListener.onDeleteCartItemClick(dish, holder.getAdapterPosition());
@@ -77,14 +72,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int countDish=Integer.parseInt(count.getText().toString());
-                countDish++;
-                count.setText(Integer.toString(countDish));
-                dish.setDishCount(countDish);
-
-                int newPrice=countDish*(dish.getDishPrice()/(countDish-1));
-                dish.setDishPrice(newPrice);
-                textView.setText(Integer.toString(dish.getDishPrice()));
 
                 clickListener.onNewCartItemCount(dish, holder.getAdapterPosition());
             }
@@ -129,8 +116,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     private ItemClickListener clickListener;
 
     public interface ItemClickListener{
-        void onDeleteCartItemClick(Dish dish, int position);
-        void onNewCartItemCount(Dish dish,int position);
+        void onDeleteCartItemClick(Dish dish, int positionDish);
+        void onNewCartItemCount(Dish dish,int positionDish);
+        void onRemoveCartItemCount(Dish dish,int positionDish);
     }
 
 }

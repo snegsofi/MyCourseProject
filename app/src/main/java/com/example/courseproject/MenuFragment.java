@@ -4,6 +4,7 @@ package com.example.courseproject;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.AnimatedVectorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -45,6 +47,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.nio.channels.SelectableChannel;
@@ -164,7 +167,9 @@ public class MenuFragment extends Fragment implements
 
         searchView.clearFocus();
 
-        setInitialData();
+        //setInitialData();
+
+        readMenu();
 
 
 
@@ -178,6 +183,9 @@ public class MenuFragment extends Fragment implements
 
                 Integer price=0;
                 for(int l=0;l<guestCount;l++){
+
+                    Log.d("contains key", selectedMenuItemGuest.keySet().toString());
+
                     if(selectedMenuItemGuest.containsKey(l)) {
 
                         List<DishesSelected> selectedDishes=selectedMenuItemGuest.get(l);
@@ -195,9 +203,10 @@ public class MenuFragment extends Fragment implements
                             }
                         }
 
-                        guestCarts.add(new GuestCart(l,dishesToCart));
+                        guestCarts.add(new GuestCart(l+1,dishesToCart));
 
                         saveCartMap.put(Integer.toString(l),dishesToCart);
+
                     }
                 }
 
@@ -258,13 +267,7 @@ public class MenuFragment extends Fragment implements
         chipRecyclerView.setAdapter(chipAdapter);
         chipAdapter.notifyDataSetChanged();
 
-        // Создание адаптера
-        adapter = new FoodCategoryAdapter(getContext(), parentModelClassList,MenuFragment.this);
-        // размещение элементов
-        parent_rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        // Прикрепрепляем адаптер к recyclerView
-        parent_rv.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+
 
         return view;
     }
@@ -375,39 +378,78 @@ public class MenuFragment extends Fragment implements
 
     // guestCartAdapter
     @Override
-    public void onDeleteCartItemClick2(GuestCart guestCart, int position) {
+    public void onDeleteCartItemClick2(GuestCart guestCart, int position, int positionDish) {
 
-       //for(int i=0;i<parentModelClassList.size();i++){
-       //    for(int j=0;j<parentModelClassList.get(i).getDishList().size();j++){
-       //        if(parentModelClassList.get(i).getDishList().get(j).getDishName().contains(guestCart.getDishList().get(i).getDishName())){
-       //            parentModelClassList.get(i).getDishList().get(j).setDishCount(guestCart.getDishList().get(i).getDishCount());
-       //            Log.d("--count",Integer.toString(parentModelClassList.get(i).getDishList().get(j).getDishCount()));
-       //            adapter.notifyDataSetChanged();
-       //        }
-       //    }
-       //}
+        Toast.makeText(getActivity(), guestCart.getDishList().get(positionDish).getDishName(),
+                Toast.LENGTH_LONG).show();
 
+        totalPriceTextView.setText(Integer.toString(Integer.parseInt(totalPriceTextView.getText().toString())-
+                (guestCart.getDishList().get(positionDish).getDishPrice()*
+                        guestCart.getDishList().get(positionDish).getDishCount())));
 
-        //Log.d("check position",guestCart.getGuestName()+"" );
-        //Log.d("check delete position", guestCarts.get(guestCart.getGuestName()).getDishList().get(position).getDishName());
-//
-        //Log.d("position", position+"");
-        //for(int i=0;i<selectedMenuItemGuest.get(guestCart.getGuestName()).size();i++){
-        //    Log.d("check delete position=", selectedMenuItemGuest.get(guestCart.getGuestName()).get(i).getDishName()+" i="+i);
-//
-        //}
-//
-        //guestCarts.get(guestCart.getGuestName()).getDishList().remove(position);
-        //guestCartAdapter.notifyDataSetChanged();
-//
-        //selectedMenuItemGuest.get(guestCart.getGuestName()).remove(position);
-        //adapter.notifyDataSetChanged();
+        guestCarts.get(position).getDishList().remove(positionDish);
+        guestCartAdapter.notifyDataSetChanged();
 
 
+        List<DishesSelected> dishes=selectedMenuItemGuest.get(guestCart.getGuestName()-1);
+
+        Log.d("guestCart number", guestCart.getGuestName()+"");
+        Log.d("key set list dishes",selectedMenuItemGuest.keySet()+"");
+        for(int i=0;i<dishes.size();i++){
+            Log.d("dishes list", dishes.get(i).getDishName()+"");
+        }
+
+        dishes.remove(positionDish);
+        selectedMenuItemGuest.put(guestCart.getGuestName()-1,dishes);
+
+        onItemClick(guestCart.getGuestName()-1);
+
+        if(dishes.isEmpty()){
+            selectedMenuItemGuest.remove(guestCart.getGuestName()-1);
+        }
+        if(guestCarts.get(position).getDishList().isEmpty()){
+            guestCarts.remove(position);
+            guestCartAdapter.notifyDataSetChanged();
+        }
 
     }
 
+    @Override
+    public void onNewCartItemCount2(GuestCart guestCart, int position, int positionDish) {
 
+        //Log.d("dish count", guestCart.getDishList().get(positionDish).getDishCount()+"");
+////
+        //guestCarts.get(position).getDishList().get(positionDish).setDishPrice(guestCart.getDishList().get(positionDish).getDishPrice()+
+        //        (guestCart.getDishList().get(positionDish).getDishPrice()/
+        //                guestCart.getDishList().get(positionDish).getDishCount()));
+        //guestCarts.get(position).getDishList().get(positionDish).setDishCount(guestCart.getDishList().get(positionDish).getDishCount()+1);
+////
+        //guestCartAdapter.notifyDataSetChanged();
+////
+        //List<DishesSelected> dishes=selectedMenuItemGuest.get(guestCart.getGuestName()-1);
+        //dishes.get(positionDish).setDishCount(guestCarts.get(position).getDishList().get(positionDish).getDishCount());
+        //selectedMenuItemGuest.put(guestCart.getGuestName()-1,dishes);
+////
+        //onItemClick(guestCart.getGuestName()-1);
+
+    }
+
+    @Override
+    public void onRemoveCartItemCount2(GuestCart guestCart, int position, int positionDish) {
+
+        //guestCarts.get(position).getDishList().get(positionDish).setDishPrice(guestCart.getDishList().get(positionDish).getDishPrice()-
+        //        (guestCart.getDishList().get(positionDish).getDishPrice()/
+        //                guestCart.getDishList().get(positionDish).getDishCount()));
+        //guestCarts.get(position).getDishList().get(positionDish).setDishCount(guestCart.getDishList().get(positionDish).getDishCount()-1);
+////
+        //guestCartAdapter.notifyDataSetChanged();
+////
+        //List<DishesSelected> dishes=selectedMenuItemGuest.get(guestCart.getGuestName()-1);
+        //dishes.get(positionDish).setDishCount(guestCarts.get(position).getDishList().get(positionDish).getDishCount());
+        //selectedMenuItemGuest.put(guestCart.getGuestName()-1,dishes);
+////
+        //onItemClick(guestCart.getGuestName()-1);
+    }
 
 
     Integer guestCount;
@@ -422,8 +464,6 @@ public class MenuFragment extends Fragment implements
             tableNumber= getArguments().getInt(ARG_PARAM2);
             waiter= getArguments().getString(ARG_PARAM3);
         }
-
-        //Log.d("waiterMenuFragment",waiter);
     }
 
 
@@ -467,18 +507,23 @@ public class MenuFragment extends Fragment implements
            @Override
            public void onClick(View view) {
 
-
                HashMap<String,List<String>> list=new HashMap<>();
                Integer price=0;
 
+
                for(int i=0;i<guestCount;i++){
                    for(int j=0;j<guestCarts.size();j++){
-                       if(guestCarts.get(j).getGuestName().equals(i)){
+                       Log.d("guest key 4", guestCarts.get(j).getGuestName()+"");
+                       if(guestCarts.get(j).getGuestName().equals(i+1)){
+
+                           Log.d("guest key 1", guestCarts.get(j).getGuestName()+"");
                            List<String> dish=new ArrayList<>();
                            for(int k=0;k<guestCarts.get(j).getDishList().size();k++){
                                for(int l=0;l<guestCarts.get(j).getDishList().get(k).getDishCount();l++){
                                    dish.add(guestCarts.get(j).getDishList().get(k).getDishName());
                                    price+=guestCarts.get(j).getDishList().get(k).getDishPrice();
+
+                                   Log.d("dish 2", dish.get(l)+"");
                                }
                            }
                            list.put(Integer.toString(i),dish);
@@ -499,7 +544,7 @@ public class MenuFragment extends Fragment implements
 
 
                // Add a new document with a generated ID
-                db.collection("Orders")
+               db.collection("Orders")
                         .add(order)
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
@@ -514,7 +559,9 @@ public class MenuFragment extends Fragment implements
                             }
                         });
 
-                setTableChecked(tableNumber);
+               setTableChecked(tableNumber);
+               Toast.makeText(getActivity(), "Заказ создан",
+                         Toast.LENGTH_LONG).show();
             }
         });
 
@@ -566,6 +613,39 @@ public class MenuFragment extends Fragment implements
                         else{
                             Log.d("Update table", "Some failed");
                         }
+                    }
+                });
+
+    }
+
+
+    public void readMenu(){
+
+        db.collection("Dishes")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @RequiresApi(api = Build.VERSION_CODES.N)
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                FoodCategory foodCategory=document.toObject(FoodCategory.class);
+
+                                parentModelClassList.add(foodCategory);
+
+                                // Создание адаптера
+                                adapter = new FoodCategoryAdapter(getContext(), parentModelClassList,MenuFragment.this);
+                                // размещение элементов
+                                parent_rv.setLayoutManager(new LinearLayoutManager(getContext()));
+                                // Прикрепрепляем адаптер к recyclerView
+                                parent_rv.setAdapter(adapter);
+                                adapter.notifyDataSetChanged();
+                            }
+                        } else {
+                            Log.w(TAG, "Error getting documents.", task.getException());
+                        }
+
                     }
                 });
 

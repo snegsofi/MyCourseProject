@@ -36,12 +36,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Иван"
         android:textSize="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="10dp"
         android:textColor="@color/black"
-        android:layout_marginBottom="10dp" />
+        android:layout_marginBottom="10dp"
+        android:id="@+id/nameTextViewHome"/>
 
     <View
         android:layout_width="match_parent"
@@ -59,12 +59,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Иванов"
         android:textSize="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="10dp"
         android:textColor="@color/black"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp"
+        android:id="@+id/surnameTextViewHome"/>/>
 
     <View
         android:layout_width="match_parent"
@@ -82,12 +82,13 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ivanov@mail.ru"
+        android:text=""
         android:textSize="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="10dp"
         android:textColor="@color/black"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp"
+        android:id="@+id/loginTextViewHome"/>/>
 
     <View
         android:layout_width="match_parent"
